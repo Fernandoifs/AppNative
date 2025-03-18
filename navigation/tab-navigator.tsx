@@ -4,36 +4,53 @@ import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '.';
 import { HeaderButton } from '../components/HeaderButton';
 import { TabBarIcon } from '../components/TabBarIcon';
-import One from '../screens/one';
-import Two from '../screens/two';
-
-const Tab = createBottomTabNavigator();
+import Members from '../screens/members';
+import Events from '../screens/events';
+import Attendance from '../screens/attendance';
 
 type Props = StackScreenProps<RootStackParamList, 'TabNavigator'>;
 
-export default function TabLayout({ navigation }: Props) {
+import type { RootTabParamList } from './types';
+
+const Tab = createBottomTabNavigator<RootTabParamList>();
+
+export default function TabLayout() {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: 'black',
-
-        headerShown: false,
+        tabBarActiveTintColor: '#4F46E5',
+        tabBarInactiveTintColor: '#6B7280',
+        headerShown: true,
+        headerStyle: {
+          backgroundColor: '#F9FAFB',
+        },
+        headerTitleStyle: {
+          color: '#111827',
+          fontWeight: 'bold',
+        },
       }}>
       <Tab.Screen
-        name="One"
-        component={One}
+        name="Members"
+        component={Members}
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => <HeaderButton onPress={() => navigation.navigate('Modal')} />,
+          title: 'Membros',
+          tabBarIcon: ({ color }) => <TabBarIcon name="people" color={color} />,
         }}
       />
       <Tab.Screen
-        name="Two"
-        component={Two}
+        name="Events"
+        component={Events}
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Eventos',
+          tabBarIcon: ({ color }) => <TabBarIcon name="calendar" color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="Attendance"
+        component={Attendance}
+        options={{
+          title: 'Presença',
+          tabBarIcon: ({ color }) => <TabBarIcon name="checkbox" color={color} />,
         }}
       />
     </Tab.Navigator>
