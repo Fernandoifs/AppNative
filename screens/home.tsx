@@ -16,8 +16,6 @@ type HomeScreenProps = CompositeScreenProps<
   StackScreenProps<RootStackParamList>
 >;
 
-
-
 const EventCard = ({ event }: { event: Event }) => (
   <View className="mb-4 bg-white rounded-lg shadow-md">
     <View className="p-4">
@@ -35,14 +33,14 @@ export default function Home() {
 
   const mappedQuickAccessItems = quickAccessItems.map(item => ({
     ...item,
-    onPress: () => navigation.navigate('Tabs', { screen: item.screenName })
+    onPress: () => navigation.navigate('TabNavigator', { screen: item.screenName })
   }));
 
   return (
     <>
       <ScrollView className="flex-1 bg-gray-100">
         <View className="p-8 bg-blue-500">
-          <Text className="text-2xl font-bold text-white text-center mb-2">Igreja Cristã</Text>
+          <Text className="text-2xl font-bold text-white text-center mb-2">Comunidade</Text>
           <Text className="text-white text-center opacity-80">
             Bem-vindo à nossa comunidade de fé, esperança e amor
           </Text>
@@ -71,32 +69,7 @@ export default function Home() {
         </View>
       </ScrollView>
 
-      <View className="bg-white border-t border-gray-200 py-2 px-4 flex-row justify-around items-center">
-        <TouchableOpacity 
-          onPress={() => navigation.navigate('Home')} 
-          className="items-center">
-          <Ionicons name="home-outline" size={24} color="#4F46E5" />
-          <Text className="text-xs text-gray-600 mt-1">Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          onPress={() => navigation.navigate('Tabs', { screen: 'Events' })} 
-          className="items-center">
-          <Ionicons name="calendar-outline" size={24} color="#6B7280" />
-          <Text className="text-xs text-gray-600 mt-1">Eventos</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          onPress={() => navigation.navigate('Tabs', { screen: 'Members' })} 
-          className="items-center">
-          <Ionicons name="people-outline" size={24} color="#6B7280" />
-          <Text className="text-xs text-gray-600 mt-1">Membros</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          onPress={() => navigation.navigate('Tabs', { screen: 'Bible' })} 
-          className="items-center">
-          <Ionicons name="book-outline" size={24} color="#6B7280" />
-          <Text className="text-xs text-gray-600 mt-1">Bíblia</Text>
-        </TouchableOpacity>
-      </View>
+
     </>
   );
 }

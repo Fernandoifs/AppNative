@@ -3,13 +3,14 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { DrawerScreenProps } from '@react-navigation/drawer';
 
 export type RootStackParamList = {
-  Root: undefined;
-  Modal: undefined;
+  DrawerNavigator: undefined;
+  TabNavigator: undefined;
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> = NativeStackScreenProps<RootStackParamList, T>;
 
 export type RootTabParamList = {
+  Home: undefined;
   Members: undefined;
   Events: undefined;
   Attendance: undefined;
@@ -23,8 +24,10 @@ export type RootTabScreenProps<T extends keyof RootTabParamList> = CompositeScre
 
 export type DrawerParamList = {
   Home: undefined;
-  One: undefined;
-  Two: undefined;
+  Members: undefined;
+  Events: undefined;
+  Attendance: undefined;
+  Bible: undefined;
 };
 
 export type DrawerScreenProps<T extends keyof DrawerParamList> = CompositeScreenProps<

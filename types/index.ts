@@ -13,17 +13,17 @@ export type Member = {
 };
 
 export type Event = {
-  id: string;
-  title: string;
-  description: string;
+  id: string | number;
+  category: string;
   date: string;
-  startTime: string;
-  endTime: string;
-  location: string;
-  type: 'service' | 'meeting' | 'celebration' | 'other';
-  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
-  createdAt: string;
-  updatedAt: string;
+  time: string;
+  status: string;
+  readings?: {
+    book: string;
+    chapter: number;
+    verses: number[];
+    description: string;
+  }[];
 };
 
 export type Attendance = {

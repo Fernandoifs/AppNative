@@ -1,65 +1,75 @@
+import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StackScreenProps } from '@react-navigation/stack';
 
 import { RootStackParamList } from '.';
-import { HeaderButton } from '../components/HeaderButton';
-import { TabBarIcon } from '../components/TabBarIcon';
+import Home from '../screens/home';
 import Members from '../screens/members';
 import Events from '../screens/events';
 import Attendance from '../screens/attendance';
 import Bible from '../screens/bible';
 
-type Props = StackScreenProps<RootStackParamList, 'TabNavigator'>;
+type Props = StackScreenProps<RootStackParamList, 'BottomTabNavigator'>;
 
-import type { RootTabParamList } from './types';
+const Tab = createBottomTabNavigator();
 
-const Tab = createBottomTabNavigator<RootTabParamList>();
-
-export default function TabLayout() {
+export default function BottomTabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: '#4F46E5',
+        headerShown: false,
+        tabBarActiveTintColor: '#3B82F6',
         tabBarInactiveTintColor: '#6B7280',
-        headerShown: true,
-        headerStyle: {
-          backgroundColor: '#F9FAFB',
-        },
-        headerTitleStyle: {
-          color: '#111827',
-          fontWeight: 'bold',
-        },
-      }}>
+        tabBarStyle: {
+          backgroundColor: '#FFFFFF',
+          borderTopWidth: 1,
+          borderTopColor: '#E5E7EB'
+        }
+      }}
+    >
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home-outline" size={size} color={color} />
+          ),
+        }}
+      />
       <Tab.Screen
         name="Members"
         component={Members}
         options={{
-          title: 'Membros',
-          tabBarIcon: ({ color }) => <TabBarIcon name="people" color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="users" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
         name="Events"
         component={Events}
         options={{
-          title: 'Eventos',
-          tabBarIcon: ({ color }) => <TabBarIcon name="calendar" color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="calendar" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
         name="Attendance"
         component={Attendance}
         options={{
-          title: 'Presença',
-          tabBarIcon: ({ color }) => <TabBarIcon name="checkbox" color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="check-square" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
         name="Bible"
         component={Bible}
         options={{
-          title: 'Bíblia',
-          tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="book" size={size} color={color} />
+          ),
         }}
       />
     </Tab.Navigator>

@@ -2,11 +2,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import DrawerNavigator from './drawer-navigator';
-import Modal from '../screens/modal';
+import BottomTabNavigator from './tab-navigator';
 
 export type RootStackParamList = {
   DrawerNavigator: undefined;
-  Modal: undefined;
   TabNavigator: undefined;
 };
 
@@ -22,9 +21,9 @@ export default function RootStack() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="Modal"
-          component={Modal}
-          options={{ presentation: 'modal', headerLeft: () => null }}
+          name="TabNavigator"
+          component={BottomTabNavigator}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

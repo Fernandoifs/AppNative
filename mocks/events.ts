@@ -1,30 +1,92 @@
 import type { Event } from '../types';
 
 export const MOCK_EVENTS: Event[] = [
-  {
-    id: '1',
-    title: 'Culto de Domingo',
-    description: 'Culto dominical com louvor e pregação',
-    date: '2024-01-21',
-    startTime: '10:00',
-    endTime: '12:00',
-    location: 'Templo Principal',
-    type: 'service',
-    status: 'upcoming',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    title: 'Reunião de Oração',
-    description: 'Momento de intercessão e busca espiritual',
-    date: '2024-01-24',
-    startTime: '19:30',
-    endTime: '21:00',
-    location: 'Sala de Oração',
-    type: 'meeting',
-    status: 'upcoming',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
+      {
+        "id": 1,
+        "category": "Culto",
+        "date": "2024-01-21",
+        "time": "19:00",
+        "status": "Confirmado",
+        "readings": [
+          {
+            "book": "Gênesis",
+            "chapter": 1,
+            "verses": [
+              1,
+              2,
+              3
+            ],
+            "description": "Leitura inicial sobre a criação"
+          },
+          {
+            "book": "Gênesis",
+            "chapter": 2,
+            "verses": [
+              1,
+              2,
+              3
+            ],
+            "description": "Leitura sobre o descanso do Senhor"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "category": "Estudo",
+        "date": "2024-01-21",
+        "time": "09:00",
+        "status": "Confirmado"
+      },
+      {
+        "id": 3,
+        "category": "Culto",
+        "date": "2024-01-23",
+        "time": "19:30",
+        "status": "Confirmado",
+        "readings": [
+          {
+            "book": "Gênesis",
+            "chapter": 24,
+            "verses": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "description": "Leitura sobre a oração de Abraão"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "category": "Juventude",
+        "date": "2024-01-27",
+        "time": "20:00",
+        "status": "Confirmado"
+      },
+      {
+        "id": 5,
+        "category": "Culto",
+        "date": "2024-01-28",
+        "time": "19:00",
+        "status": "Confirmado",
+        "readings": [
+          {
+            "book": "Gênesis",
+            "chapter": 1,
+            "verses": [
+              27,
+              28
+            ],
+            "description": "Leitura sobre a criação da família"
+          },
+          {
+            "book": "Gênesis",
+            "chapter": 2,
+            "verses": [
+              24
+            ],
+            "description": "Leitura sobre a união familiar"
+          }
+        ]
+      }]
