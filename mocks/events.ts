@@ -89,4 +89,6 @@ export const MOCK_EVENTS: Event[] = [
             "description": "Leitura sobre a união familiar"
           }
         ]
-      }]
+      }
+];
+
