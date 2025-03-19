@@ -7,6 +7,7 @@ import { TabBarIcon } from '../components/TabBarIcon';
 import Members from '../screens/members';
 import Events from '../screens/events';
 import Attendance from '../screens/attendance';
+import Bible from '../screens/bible';
 
 type Props = StackScreenProps<RootStackParamList, 'TabNavigator'>;
 
@@ -51,6 +52,14 @@ export default function TabLayout() {
         options={{
           title: 'Presença',
           tabBarIcon: ({ color }) => <TabBarIcon name="checkbox" color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="Bible"
+        component={Bible}
+        options={{
+          title: 'Bíblia',
+          tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
         }}
       />
     </Tab.Navigator>

@@ -10,6 +10,7 @@ export const Button = forwardRef<View, ButtonProps>(({ title, ...touchableProps 
     <TouchableOpacity
       ref={ref}
       {...touchableProps}
+      style={{ pointerEvents: 'auto' }}
       className={`${styles.button} ${touchableProps.className}`}>
       <Text className={styles.buttonText}>{title}</Text>
     </TouchableOpacity>

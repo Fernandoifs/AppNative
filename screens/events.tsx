@@ -3,22 +3,7 @@ import { FlatList, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '../components/Button';
 import type { Event } from '../types';
-
-const MOCK_EVENTS: Event[] = [
-  {
-    id: '1',
-    title: 'Culto de Domingo',
-    description: 'Culto dominical com louvor e pregação',
-    date: '2024-01-21',
-    startTime: '10:00',
-    endTime: '12:00',
-    location: 'Templo Principal',
-    type: 'service',
-    status: 'upcoming',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
+import { MOCK_EVENTS } from '../mocks/events';
 
 export default function Events() {
   const [events] = useState<Event[]>(MOCK_EVENTS);

@@ -1,96 +1,70 @@
-import { ScrollView, Text, View, Image } from 'react-native';
+import React from 'react';
+import { ScrollView, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Button } from '../components/Button';
+import { useNavigation } from '@react-navigation/native';
 import type { Event } from '../types';
+import { MOCK_EVENTS } from '../mocks/events';
+import type { DrawerScreenProps } from '@react-navigation/drawer';
+import type { CompositeScreenProps } from '@react-navigation/native';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList, RootTabParamList, DrawerParamList } from '../navigation/types';
+import { quickAccessItems } from '../constants/navigation';
+import { QuickAccessCard } from '../components/QuickAccessCard';
 
-type QuickAccessCardProps = {
-  title: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  onPress: () => void;
-  color: string;
-};
+type HomeScreenProps = CompositeScreenProps<
+  DrawerScreenProps<DrawerParamList>,
+  StackScreenProps<RootStackParamList>
+>;
 
-const QuickAccessCard = ({ title, icon, onPress, color }: QuickAccessCardProps) => (
-  <Button
-    onPress={onPress}
-    className="items-center justify-center p-4 m-2 bg-white rounded-lg shadow-md w-[160px] h-[120px]">
-    <Ionicons name={icon} size={32} color={color} />
-    <Text className="mt-2 text-gray-800 font-medium text-center">{title}</Text>
-  </Button>
-);
+
 
 const EventCard = ({ event }: { event: Event }) => (
-  <View className="bg-white rounded-lg shadow-md overflow-hidden mb-4">
+  <View className="mb-4 bg-white rounded-lg shadow-md">
     <View className="p-4">
-      <View className="bg-blue-100 self-start px-2 py-1 rounded-full mb-2">
-        <Text className="text-blue-800 text-xs font-medium">Evento</Text>
+      <View className="self-start px-2 py-1 mb-2 bg-blue-100 rounded-full">
+        <Text className="text-xs font-medium text-blue-700">Evento</Text>
       </View>
-      <Text className="text-lg font-medium text-gray-800 mb-1">{event.title}</Text>
-      <Text className="text-gray-600">
-        {event.date} • {event.startTime} - {event.endTime}
-      </Text>
+      <Text className="text-lg font-semibold text-gray-900">{event.title}</Text>
+      <Text className="text-gray-600">{event.date} • {event.startTime} - {event.endTime}</Text>
     </View>
   </View>
 );
 
-const MOCK_EVENTS: Event[] = [
-  {
-    id: '1',
-    title: 'Culto de Domingo',
-    description: 'Culto dominical com louvor e pregação',
-    date: '2024-01-21',
-    startTime: '10:00',
-    endTime: '12:00',
-    location: 'Templo Principal',
-    type: 'service',
-    status: 'upcoming',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    title: 'Reunião de Oração',
-    description: 'Momento de intercessão e busca espiritual',
-    date: '2024-01-24',
-    startTime: '19:30',
-    endTime: '21:00',
-    location: 'Sala de Oração',
-    type: 'meeting',
-    status: 'upcoming',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
-
 export default function Home() {
-  const quickAccessItems = [
-    { title: 'Visitas Pastorais', icon: 'home', color: '#3B82F6', onPress: () => {} },
-    { title: 'Eventos', icon: 'calendar', color: '#10B981', onPress: () => {} },
-    { title: 'Pedidos de Oração', icon: 'heart', color: '#8B5CF6', onPress: () => {} },
-    { title: 'Dízimos e Ofertas', icon: 'gift', color: '#EF4444', onPress: () => {} },
-  ];
+  const navigation = useNavigation<HomeScreenProps['navigation']>();
+
+  const mappedQuickAccessItems = quickAccessItems.map(item => ({
+    ...item,
+    onPress: () => navigation.navigate('Tabs', { screen: item.screenName })
+  }));
 
   return (
     <>
-      <ScrollView className="flex-1 bg-gray-50">
-        <View className="p-8 bg-blue-600">
-          <Text className="text-3xl font-bold text-white mb-2 text-center">Igreja Cristã</Text>
-          <Text className="text-white opacity-80 text-center">
+      <ScrollView className="flex-1 bg-gray-100">
+        <View className="p-8 bg-blue-500">
+          <Text className="text-2xl font-bold text-white text-center mb-2">Igreja Cristã</Text>
+          <Text className="text-white text-center opacity-80">
             Bem-vindo à nossa comunidade de fé, esperança e amor
           </Text>
         </View>
 
         <View className="p-4">
-          <Text className="text-xl font-semibold text-gray-800 mb-4">Acesso Rápido</Text>
+          <Text className="text-xl font-semibold text-gray-900 mb-4">Acesso Rápido</Text>
           <View className="flex-row flex-wrap justify-between">
-            {quickAccessItems.map((item, index) => (
-              <QuickAccessCard key={index} {...item} />
+            {mappedQuickAccessItems.map((item, index) => (
+              <QuickAccessCard 
+                key={index} 
+                title={item.title}
+                icon={item.icon as keyof typeof Ionicons.glyphMap}
+                color={item.color}
+                onPress={item.onPress}
+              />
             ))}
           </View>
         </View>
 
         <View className="p-4">
-          <Text className="text-xl font-semibold text-gray-800 mb-4">Próximos Eventos</Text>
+          <Text className="text-xl font-semibold text-gray-900 mb-4">Próximos Eventos</Text>
           {MOCK_EVENTS.map((event) => (
             <EventCard key={event.id} event={event} />
           ))}
@@ -98,20 +72,31 @@ export default function Home() {
       </ScrollView>
 
       <View className="bg-white border-t border-gray-200 py-2 px-4 flex-row justify-around items-center">
-        <Button onPress={() => {}} className="items-center">
-          <Ionicons name="home" size={24} color="#4F46E5" />
-        </Button>
-        <Button onPress={() => {}} className="items-center">
-          <Ionicons name="calendar" size={24} color="#6B7280" />
-        </Button>
-        <Button onPress={() => {}} className="items-center">
-          <Ionicons name="book" size={24} color="#6B7280" />
-        </Button>
-        <Button onPress={() => {}} className="items-center">
-          <Ionicons name="gift" size={24} color="#6B7280" />
-        </Button>
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('Home')} 
+          className="items-center">
+          <Ionicons name="home-outline" size={24} color="#4F46E5" />
+          <Text className="text-xs text-gray-600 mt-1">Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('Tabs', { screen: 'Events' })} 
+          className="items-center">
+          <Ionicons name="calendar-outline" size={24} color="#6B7280" />
+          <Text className="text-xs text-gray-600 mt-1">Eventos</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('Tabs', { screen: 'Members' })} 
+          className="items-center">
+          <Ionicons name="people-outline" size={24} color="#6B7280" />
+          <Text className="text-xs text-gray-600 mt-1">Membros</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('Tabs', { screen: 'Bible' })} 
+          className="items-center">
+          <Ionicons name="book-outline" size={24} color="#6B7280" />
+          <Text className="text-xs text-gray-600 mt-1">Bíblia</Text>
+        </TouchableOpacity>
       </View>
     </>
   );
-
 }

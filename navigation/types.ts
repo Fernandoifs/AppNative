@@ -13,6 +13,7 @@ export type RootTabParamList = {
   Members: undefined;
   Events: undefined;
   Attendance: undefined;
+  Bible: undefined;
 };
 
 export type RootTabScreenProps<T extends keyof RootTabParamList> = CompositeScreenProps<
