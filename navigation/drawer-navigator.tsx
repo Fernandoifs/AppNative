@@ -23,7 +23,8 @@ export default function DrawerNavigator({ navigation }: Props) {
           width: 280
         },
         drawerLabelStyle: {
-          marginLeft: -16
+          marginLeft: 5,
+          fontSize: 16
         }
       }}
     >
@@ -31,7 +32,7 @@ export default function DrawerNavigator({ navigation }: Props) {
         name="TabNavigator"
         component={BottomTabNavigator}
         options={{
-          title: '',
+          title: 'Início',
           drawerIcon: ({ size, color }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),
