@@ -1,14 +1,15 @@
-import { useState, useCallback } from 'react';
-import { 
-  FlatList, Text, View, Modal, TextInput, TouchableOpacity, ScrollView 
+import React, { useState, useCallback } from 'react';
+import {
+  FlatList, Text, View, Modal, TouchableOpacity, ScrollView, Alert
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { DatePickerModal, TimePickerModal } from 'react-native-paper-dates';
 import { Ionicons } from '@expo/vector-icons';
-import { Button } from '../components/Button';
-import type { Event } from '../types';
-import { MOCK_EVENTS } from '../mocks/events';
 import { Calendar } from 'react-native-calendars';
+import * as bibleData from '../mocks/bible.json';
+import type { Event } from '../types';
+import { Button } from 'components/Button';
 
 const BIBLE_BOOKS = [
   'Gênesis', 'Êxodo', 'Levítico', 'Números', 'Deuteronômio',
@@ -43,32 +44,110 @@ type NewEventType = {
 };
 
 export default function Events() {
-  const [events, setEvents] = useState<Event[]>(MOCK_EVENTS);
+  const navigation = useNavigation<any>();
+  const [events, setEvents] = useState<Event[]>([]);
   const [selectedDate, setSelectedDate] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [isTimePickerVisible, setIsTimePickerVisible] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [isDetailsModalVisible, setIsDetailsModalVisible] = useState(false);
   const [newEvent, setNewEvent] = useState<NewEventType>({
-    category: '',
+    category: 'Culto', // Categoria padrão
     date: '',
     time: '',
     status: 'Confirmado',
-    readings: [],
+    readings: [{
+      book: 'Gênesis',
+      chapter: '1',
+      startVerse: '1',
+      endVerse: '1'
+    }]
   });
 
-  const categories = ['Culto', 'Estudo', 'Juventude', 'Celebração', 'Outro'];
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setNewEvent({
+      category: 'Culto', // Redefine a categoria para "Culto"
+      date: '',
+      time: '',
+      status: 'Confirmado',
+      readings: [{
+        book: 'Gênesis',
+        chapter: '1',
+        startVerse: '1',
+        endVerse: '1'
+      }]
+    });
+  };
+
+  const handleCreateEvent = () => {
+    const missingFields = [];
+    if (!newEvent.category) missingFields.push('Categoria');
+    if (!newEvent.date) missingFields.push('Data');
+    if (!newEvent.time) missingFields.push('Horário');
+    if (newEvent.category === 'Culto' && (!newEvent.readings || newEvent.readings.length === 0)) {
+      missingFields.push('Leituras Bíblicas');
+    }
+
+    if (missingFields.length > 0) {
+      Alert.alert(
+        'Campos Obrigatórios',
+        `Por favor, preencha os seguintes campos: ${missingFields.join(', ')}`,
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    const newEventData = {
+      id: events.length + 1,
+      category: newEvent.category,
+      date: newEvent.date,
+      time: newEvent.time,
+      status: newEvent.status,
+      readings: newEvent.category === 'Culto' && newEvent.readings
+        ? newEvent.readings.map(reading => ({
+          book: reading.book,
+          chapter: parseInt(reading.chapter, 10),
+          verses: [parseInt(reading.startVerse, 10), parseInt(reading.endVerse, 10)],
+          description: `Leitura de ${reading.book} ${reading.chapter}:${reading.startVerse}-${reading.endVerse}`
+        }))
+        : undefined
+    };
+
+    setEvents(prev => [...prev, newEventData]);
+    setIsModalVisible(false);
+
+    // Redefine o estado de newEvent para o padrão
+    setNewEvent({
+      category: 'Culto', // Categoria padrão
+      date: '',
+      time: '',
+      status: 'Confirmado',
+      readings: [{
+        book: 'Gênesis',
+        chapter: '1',
+        startVerse: '1',
+        endVerse: '1'
+      }]
+    });
+
+    Alert.alert('Sucesso', 'Evento criado com sucesso!', [{ text: 'OK' }]);
+  };
 
   const addReading = useCallback(() => {
     setNewEvent(prev => ({
       ...prev,
       readings: [...(prev.readings || []), {
         book: BIBLE_BOOKS[0],
-        chapter: '',
-        startVerse: '',
-        endVerse: '',
+        chapter: '1',
+        startVerse: '1',
+        endVerse: '1'
       }]
     }));
   }, []);
+
+  const categories = ['Culto', 'Estudo', 'Juventude', 'Celebração', 'Outro'];
 
   const updateReading = useCallback((index: number, field: keyof Reading, value: string) => {
     setNewEvent(prev => {
@@ -101,64 +180,53 @@ export default function Events() {
     setIsModalVisible(true);
   };
 
-  const handleCreateEvent = () => {
-    if (!newEvent.category || !newEvent.date || !newEvent.time) return;
-
-    const newEventData: Event = {
-      id: events.length + 1,
-      category: newEvent.category,
-      date: newEvent.date,
-      time: newEvent.time,
-      status: newEvent.status,
-      ...(newEvent.category === 'Culto' && newEvent.readings?.length ? {
-        readings: newEvent.readings.map(reading => ({
-          book: reading.book,
-          chapter: parseInt(reading.chapter, 10),
-          verses: [parseInt(reading.startVerse, 10), parseInt(reading.endVerse, 10)],
-          description: `Leitura de ${reading.book} ${reading.chapter}:${reading.startVerse}-${reading.endVerse}`,
-        }))
-      } : {})
-    };
-
-    setEvents(prev => [...prev, newEventData]);
-    setIsModalVisible(false);
-    setNewEvent({ category: '', date: '', time: '', status: 'Confirmado', readings: [] });
-  };
-
-  const handleDateConfirm = (date: Date) => {
+  const handleDateConfirm = ({ date }: { date: Date }) => {
     setNewEvent(prev => ({ ...prev, date: date.toISOString().split('T')[0] }));
     setIsDatePickerVisible(false);
   };
 
+  const handleTimeConfirm = ({ hours, minutes }: { hours: number, minutes: number }) => {
+    const time = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    setNewEvent(prev => ({ ...prev, time }));
+    setIsTimePickerVisible(false);
+  };
+
+  const handleEventPress = (event: Event) => {
+    setSelectedEvent(event);
+    setIsDetailsModalVisible(true);
+  };
+
   const renderEventItem = ({ item }: { item: Event }) => (
-    <View className="bg-white p-4 mb-2 rounded-lg shadow-sm">
-      <View className="flex-row justify-between items-center">
-        <Text className="text-lg font-medium text-gray-800">{item.category}</Text>
-        <View className="bg-blue-100 px-2 py-1 rounded-full">
-          <Text className="text-xs text-blue-700">{item.status}</Text>
+    <TouchableOpacity onPress={() => handleEventPress(item)}>
+      <View className="bg-white p-4 mb-2 rounded-lg shadow-sm">
+        <View className="flex-row justify-between items-center">
+          <Text className="text-lg font-medium text-gray-800">{item.category}</Text>
+          <View className="bg-blue-100 px-2 py-1 rounded-full">
+            <Text className="text-xs text-blue-700">{item.status}</Text>
+          </View>
         </View>
+        <View className="flex-row mt-2">
+          <View className="flex-row items-center mr-4">
+            <Ionicons name="calendar" size={16} color="#4F46E5" />
+            <Text className="text-gray-600 ml-1">{item.date}</Text>
+          </View>
+          <View className="flex-row items-center">
+            <Ionicons name="time" size={16} color="#4F46E5" />
+            <Text className="text-gray-600 ml-1">{item.time}</Text>
+          </View>
+        </View>
+        {item.category === 'Culto' && item.readings && (
+          <View className="mt-2 border-t border-gray-100 pt-2">
+            <Text className="text-sm font-medium text-gray-700 mb-1">Leituras Bíblicas:</Text>
+            {item.readings.map((reading, index) => (
+              <Text key={index} className="text-sm text-gray-600">
+                {reading.description}
+              </Text>
+            ))}
+          </View>
+        )}
       </View>
-      <View className="flex-row mt-2">
-        <View className="flex-row items-center mr-4">
-          <Ionicons name="calendar" size={16} color="#4F46E5" />
-          <Text className="text-gray-600 ml-1">{item.date}</Text>
-        </View>
-        <View className="flex-row items-center">
-          <Ionicons name="time" size={16} color="#4F46E5" />
-          <Text className="text-gray-600 ml-1">{item.time}</Text>
-        </View>
-      </View>
-      {item.category === 'Culto' && item.readings && (
-        <View className="mt-2 border-t border-gray-100 pt-2">
-          <Text className="text-sm font-medium text-gray-700 mb-1">Leituras Bíblicas:</Text>
-          {item.readings.map((reading, index) => (
-            <Text key={index} className="text-sm text-gray-600">
-              {reading.description}
-            </Text>
-          ))}
-        </View>
-      )}
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -167,6 +235,7 @@ export default function Events() {
       <Calendar
         onDayPress={handleDayPress}
         markedDates={markedDates}
+        locale="pt-br"
         theme={{
           todayTextColor: '#4F46E5',
           selectedDayBackgroundColor: '#4F46E5',
@@ -184,13 +253,12 @@ export default function Events() {
           <View className="bg-white p-6 rounded-lg w-[90%] max-w-md">
             <ScrollView className="max-h-[80vh]">
               <Text className="text-xl font-bold mb-4">Criar Novo Evento</Text>
-              
+
               <Text className="text-gray-700 mb-2">Categoria</Text>
               <Picker
                 selectedValue={newEvent.category}
                 onValueChange={(value) => setNewEvent(prev => ({ ...prev, category: value }))}
                 className="mb-4 bg-gray-100 rounded-lg">
-                <Picker.Item label="Selecione uma categoria" value="" />
                 {categories.map((category) => (
                   <Picker.Item key={category} label={category} value={category} />
                 ))}
@@ -224,7 +292,7 @@ export default function Events() {
                       <Ionicons name="add" size={20} color="#4F46E5" />
                     </TouchableOpacity>
                   </View>
-                  
+
                   {newEvent.readings?.map((reading, index) => (
                     <View key={index} className="bg-gray-50 p-3 rounded-lg mb-2">
                       <View className="flex-row justify-between items-center mb-2">
@@ -234,46 +302,50 @@ export default function Events() {
                         </TouchableOpacity>
                       </View>
 
-                      <Text className="text-gray-700 mb-1">Livro</Text>
-                      <Picker
-                        selectedValue={reading.book}
-                        onValueChange={(value) => updateReading(index, 'book', value)}
-                        className="mb-2 bg-white rounded-lg">
-                        {BIBLE_BOOKS.map((book) => (
-                          <Picker.Item key={book} label={book} value={book} />
-                        ))}
-                      </Picker>
-
                       <View className="flex-row gap-2 mb-2">
                         <View className="flex-1">
+                          <Text className="text-gray-700 mb-1">Livro</Text>
+                          <Picker
+                            selectedValue={reading.book}
+                            onValueChange={(value) => updateReading(index, 'book', value)}
+                            className="bg-white rounded-lg">
+                            {BIBLE_BOOKS.map((book) => (
+                              <Picker.Item key={book} label={book} value={book} />
+                            ))}
+                          </Picker>
+                        </View>
+                        <View className="flex-1">
                           <Text className="text-gray-700 mb-1">Capítulo</Text>
-                          <TextInput
-                            value={reading.chapter}
-                            onChangeText={(value) => updateReading(index, 'chapter', value)}
-                            keyboardType="numeric"
-                            className="bg-white p-2 rounded-lg"
-                            placeholder="Cap."
-                          />
+                          <Picker
+                            selectedValue={reading.chapter}
+                            onValueChange={(value) => updateReading(index, 'chapter', value)}
+                            className="bg-white rounded-lg">
+                            {Array.from({ length: 150 }, (_, i) => i + 1).map((num) => (
+                              <Picker.Item key={num} label={String(num)} value={String(num)} />
+                            ))}
+                          </Picker>
                         </View>
                         <View className="flex-1">
                           <Text className="text-gray-700 mb-1">Versículo Inicial</Text>
-                          <TextInput
-                            value={reading.startVerse}
-                            onChangeText={(value) => updateReading(index, 'startVerse', value)}
-                            keyboardType="numeric"
-                            className="bg-white p-2 rounded-lg"
-                            placeholder="Início"
-                          />
+                          <Picker
+                            selectedValue={reading.startVerse}
+                            onValueChange={(value) => updateReading(index, 'startVerse', value)}
+                            className="bg-white rounded-lg">
+                            {Array.from({ length: 176 }, (_, i) => i + 1).map((num) => (
+                              <Picker.Item key={num} label={String(num)} value={String(num)} />
+                            ))}
+                          </Picker>
                         </View>
                         <View className="flex-1">
                           <Text className="text-gray-700 mb-1">Versículo Final</Text>
-                          <TextInput
-                            value={reading.endVerse}
-                            onChangeText={(value) => updateReading(index, 'endVerse', value)}
-                            keyboardType="numeric"
-                            className="bg-white p-2 rounded-lg"
-                            placeholder="Fim"
-                          />
+                          <Picker
+                            selectedValue={reading.endVerse}
+                            onValueChange={(value) => updateReading(index, 'endVerse', value)}
+                            className="bg-white rounded-lg">
+                            {Array.from({ length: 176 }, (_, i) => i + 1).map((num) => (
+                              <Picker.Item key={num} label={String(num)} value={String(num)} />
+                            ))}
+                          </Picker>
                         </View>
                       </View>
                     </View>
@@ -281,34 +353,115 @@ export default function Events() {
                 </View>
               )}
 
-              <Button
-                title="Criar Evento"
-                onPress={handleCreateEvent}
-                className="bg-indigo-500"
-                disabled={!newEvent.category || !newEvent.date || !newEvent.time}
-              />
+              <View className="flex-row gap-2">
+                <Button
+                  title="Cancelar"
+                  onPress={handleCancel}
+                  className="bg-gray-500 flex-1"
+                />
+                <Button
+                  title="Criar Evento"
+                  onPress={handleCreateEvent}
+                  className="bg-indigo-500 flex-1"
+                  disabled={!newEvent.category || !newEvent.date || !newEvent.time}
+                />
+              </View>
             </ScrollView>
           </View>
         </View>
       </Modal>
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
+      <DatePickerModal
+        locale="pt"
+        mode="single"
+        visible={isDatePickerVisible}
+        onDismiss={() => setIsDatePickerVisible(false)}
+        date={newEvent.date ? new Date(newEvent.date) : undefined}
         onConfirm={handleDateConfirm}
-        onCancel={() => setIsDatePickerVisible(false)}
       />
-      <DateTimePickerModal
-        isVisible={isTimePickerVisible}
-        mode="time"
-        onConfirm={(time) => {
-          setNewEvent(prev => ({
-            ...prev,
-            time: time.toLocaleTimeString().slice(0, 5)
-          }));
-          setIsTimePickerVisible(false);
-        }}
-        onCancel={() => setIsTimePickerVisible(false)}
+      <TimePickerModal
+        visible={isTimePickerVisible}
+        onDismiss={() => setIsTimePickerVisible(false)}
+        onConfirm={handleTimeConfirm}
+        hours={12}
+        minutes={0}
       />
+      <Modal visible={isDetailsModalVisible} transparent animationType="slide">
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <View className="bg-white p-6 rounded-lg w-[90%] max-w-md">
+            <ScrollView className="max-h-[80vh]">
+              {selectedEvent && (
+                <>
+                  <View className="flex-row justify-between items-center mb-4">
+                    <Text className="text-xl font-bold text-gray-800">{selectedEvent.category}</Text>
+                    <TouchableOpacity
+                      onPress={() => setIsDetailsModalVisible(false)}
+                      className="bg-gray-100 p-2 rounded-full"
+                    >
+                      <Ionicons name="close" size={24} color="#4F46E5" />
+                    </TouchableOpacity>
+                  </View>
+
+                  <View className="bg-gray-50 p-4 rounded-lg mb-4">
+                    <View className="flex-row items-center mb-2">
+                      <Ionicons name="calendar" size={20} color="#4F46E5" />
+                      <Text className="text-gray-700 ml-2 font-medium">Data</Text>
+                    </View>
+                    <Text className="text-gray-600">{selectedEvent.date}</Text>
+                  </View>
+
+                  <View className="bg-gray-50 p-4 rounded-lg mb-4">
+                    <View className="flex-row items-center mb-2">
+                      <Ionicons name="time" size={20} color="#4F46E5" />
+                      <Text className="text-gray-700 ml-2 font-medium">Horário</Text>
+                    </View>
+                    <Text className="text-gray-600">{selectedEvent.time}</Text>
+                  </View>
+
+                  <View className="bg-gray-50 p-4 rounded-lg mb-4">
+                    <View className="flex-row items-center mb-2">
+                      <Ionicons name="information-circle" size={20} color="#4F46E5" />
+                      <Text className="text-gray-700 ml-2 font-medium">Status</Text>
+                    </View>
+                    <View className="bg-blue-100 self-start px-3 py-1 rounded-full">
+                      <Text className="text-blue-700">{selectedEvent.status}</Text>
+                    </View>
+                  </View>
+
+                  {selectedEvent && selectedEvent.category === 'Culto' && selectedEvent.readings && (
+                    <View className="bg-gray-50 p-4 rounded-lg">
+                      <View className="flex-row items-center mb-3">
+                        <Ionicons name="book" size={20} color="#4F46E5" />
+                        <Text className="text-gray-700 ml-2 font-medium">Leituras Bíblicas</Text>
+                      </View>
+                      {selectedEvent.readings.map((reading, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          className="mb-2 last:mb-0"
+                          onPress={() => {
+                            const bookData = bibleData.biblia.livros.find(b => b.nome === reading.book);
+                            if (bookData) {
+                              navigation.navigate('Bible', {
+                                initialBook: bookData,
+                                initialChapter: reading.chapter,
+                                initialVerse: reading.verses[0]
+                              });
+                              setIsDetailsModalVisible(false);
+                            }
+                          }}
+                        >
+                          <Text className="text-gray-600">
+                            {`Leitura de ${reading.book} ${reading.chapter}:${reading.verses[0]}-${reading.verses[1]}`}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
+                </>
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

@@ -12,7 +12,7 @@ type QuickAccessCardProps = {
 export const QuickAccessCard = ({ title, icon, onPress, color }: QuickAccessCardProps) => (
   <TouchableOpacity
     onPress={onPress}
-    className="items-center justify-center p-4 m-2 bg-white rounded-lg shadow-md w-[calc(50%-16px)] h-28"
+    className="items-center justify-center p-4 bg-white rounded-lg shadow-md w-40 h-32"
   >
     <Ionicons name={icon} size={32} color={color} />
     <Text className="mt-2 text-gray-900 font-medium text-center">{title}</Text>
