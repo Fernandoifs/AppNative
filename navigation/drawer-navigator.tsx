@@ -1,6 +1,7 @@
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { StackScreenProps } from '@react-navigation/stack';
+import { useWindowDimensions } from 'react-native';
 
 import { RootStackParamList } from '.';
 import BottomTabNavigator from './tab-navigator';
@@ -15,16 +16,34 @@ type Props = StackScreenProps<RootStackParamList, 'DrawerNavigator'>;
 const Drawer = createDrawerNavigator();
 
 export default function DrawerNavigator({ navigation }: Props) {
+  const { width } = useWindowDimensions();
+  const isLargeScreen = width >= 1024; // Define se a tela é grande
+
   return (
     <Drawer.Navigator
       screenOptions={{
+        headerShown: isLargeScreen,
         drawerStyle: {
           backgroundColor: '#FFFFFF',
-          width: 280
+          width: isLargeScreen ? 300 : 240, // 📏 Ajuste dinâmico da largura do menu
         },
         drawerLabelStyle: {
-          marginLeft: 5,
-          fontSize: 16
+          marginLeft: 8,
+          fontSize: isLargeScreen ? 18 : 16, // 📏 Tamanho do texto ajustável
+        },
+        drawerType: isLargeScreen ? 'permanent' : 'slide', // 🖥️ Fixo no desktop, deslizante no mobile
+        headerStyle: {
+          height: 60
+        },
+        headerLeftContainerStyle: {
+          paddingLeft: 16
+        },
+        headerTitleStyle: {
+          fontSize: 20
+        },
+        drawerIconStyle: {
+          width: isLargeScreen ? 32 : 28, // 📏 Ícones maiores em telas grandes
+          height: isLargeScreen ? 32 : 28
         }
       }}
     >
@@ -39,12 +58,12 @@ export default function DrawerNavigator({ navigation }: Props) {
         }}
       />
       <Drawer.Screen
-        name="Members"
-        component={Members}
+        name="Bible"
+        component={Bible}
         options={{
-          title: 'Membros',
+          title: 'Bíblia',
           drawerIcon: ({ size, color }) => (
-            <FontAwesome name="users" size={size} color={color} />
+            <FontAwesome name="book" size={size} color={color} />
           ),
         }}
       />
@@ -59,22 +78,22 @@ export default function DrawerNavigator({ navigation }: Props) {
         }}
       />
       <Drawer.Screen
+        name="Members"
+        component={Members}
+        options={{
+          title: 'Membros',
+          drawerIcon: ({ size, color }) => (
+            <FontAwesome name="users" size={size} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
         name="Attendance"
         component={Attendance}
         options={{
           title: 'Presença',
           drawerIcon: ({ size, color }) => (
             <FontAwesome name="check-square" size={size} color={color} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="Bible"
-        component={Bible}
-        options={{
-          title: 'Bíblia',
-          drawerIcon: ({ size, color }) => (
-            <FontAwesome name="book" size={size} color={color} />
           ),
         }}
       />

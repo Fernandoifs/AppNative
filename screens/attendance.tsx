@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FlatList, Text, View } from 'react-native';
+import { FlatList, Text, View, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '../components/Button';
 import type { Event, Member, Attendance as AttendanceType } from '../types';
@@ -20,16 +20,10 @@ const MOCK_MEMBERS: Member[] = [
 
 const MOCK_EVENT: Event = {
   id: '1',
-  title: 'Culto de Domingo',
-  description: 'Culto dominical com louvor e pregação',
   date: '2024-01-21',
-  startTime: '10:00',
-  endTime: '12:00',
-  location: 'Templo Principal',
-  type: 'service',
+  time: '10:00',
+  category: 'service',
   status: 'upcoming',
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
 };
 
 const MOCK_ATTENDANCE: Record<string, AttendanceType> = {
@@ -77,7 +71,7 @@ export default function Attendance() {
       <View className="bg-white p-4 mb-2 rounded-lg shadow-sm">
         <View className="flex-row justify-between items-center">
           <Text className="text-lg font-medium text-gray-800">{item.name}</Text>
-          <Button
+          <Button title=""
             onPress={() => toggleAttendance(item.id)}
             className={`p-2 rounded-full ${isPresent ? 'bg-green-500' : 'bg-gray-300'}`}>
             <Ionicons
@@ -92,19 +86,21 @@ export default function Attendance() {
   };
 
   return (
-    <View className="flex-1 bg-gray-50 p-4">
-      <View className="mb-4">
-        <Text className="text-2xl font-bold text-gray-800 mb-2">{MOCK_EVENT.title}</Text>
-        <Text className="text-gray-600">
-          {MOCK_EVENT.date} • {MOCK_EVENT.startTime} - {MOCK_EVENT.endTime}
-        </Text>
+    <ScrollView className="flex-1 bg-gray-50">
+      <View className="max-w-screen-2xl mx-auto w-full px-4 md:px-8">
+        <View className="mb-4">
+          <Text className="text-2xl font-bold text-gray-800 mb-2">{MOCK_EVENT.title}</Text>
+          <Text className="text-gray-600">
+            {MOCK_EVENT.date} • {MOCK_EVENT.startTime} - {MOCK_EVENT.endTime}
+          </Text>
+        </View>
+        <FlatList
+          data={members}
+          renderItem={renderMemberItem}
+          keyExtractor={(item) => item.id}
+          className="flex-1"
+        />
       </View>
-      <FlatList
-        data={members}
-        renderItem={renderMemberItem}
-        keyExtractor={(item) => item.id}
-        className="flex-1"
-      />
-    </View>
+    </ScrollView>
   );
 }

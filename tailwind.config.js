@@ -8,8 +8,19 @@ module.exports = {
   ],
 
   presets: [require('nativewind/preset')],
+  darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        dark: {
+          background: '#1a1a1a',
+          text: '#ffffff',
+          primary: '#3b82f6',
+          card: '#2d2d2d',
+          border: '#404040',
+        },
+      },
+    },
   },
   plugins: [],
 };

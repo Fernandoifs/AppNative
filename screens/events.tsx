@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import {
   FlatList, Text, View, Modal, TouchableOpacity, ScrollView, Alert
 } from 'react-native';
+import { useEventsStore } from '../store/events';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
 import { DatePickerModal, TimePickerModal } from 'react-native-paper-dates';
@@ -45,7 +46,7 @@ type NewEventType = {
 
 export default function Events() {
   const navigation = useNavigation<any>();
-  const [events, setEvents] = useState<Event[]>([]);
+  const { events, addEvent } = useEventsStore();
   const [selectedDate, setSelectedDate] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
@@ -115,7 +116,7 @@ export default function Events() {
         : undefined
     };
 
-    setEvents(prev => [...prev, newEventData]);
+    addEvent(newEventData);
     setIsModalVisible(false);
 
     // Redefine o estado de newEvent para o padrão

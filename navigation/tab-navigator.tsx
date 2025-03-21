@@ -1,3 +1,4 @@
+import { Platform, useWindowDimensions } from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -9,11 +10,14 @@ import Events from '../screens/events';
 import Attendance from '../screens/attendance';
 import Bible from '../screens/bible';
 
-type Props = StackScreenProps<RootStackParamList, 'BottomTabNavigator'>;
+type Props = StackScreenProps<RootStackParamList>;
 
 const Tab = createBottomTabNavigator();
 
 export default function BottomTabNavigator() {
+  const { width } = useWindowDimensions();
+  const isLargeScreen = width >= 1024;
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -23,7 +27,8 @@ export default function BottomTabNavigator() {
         tabBarStyle: {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
-          borderTopColor: '#E5E7EB'
+          borderTopColor: '#E5E7EB',
+          display: Platform.OS === 'web' && isLargeScreen ? 'none' : 'flex'
         }
       }}
     >
@@ -37,11 +42,11 @@ export default function BottomTabNavigator() {
         }}
       />
       <Tab.Screen
-        name="Members"
-        component={Members}
+        name="Bible"
+        component={Bible}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="users" size={size} color={color} />
+            <FontAwesome name="book" size={size} color={color} />
           ),
         }}
       />
@@ -55,20 +60,20 @@ export default function BottomTabNavigator() {
         }}
       />
       <Tab.Screen
+        name="Members"
+        component={Members}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="users" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
         name="Attendance"
         component={Attendance}
         options={{
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="check-square" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Bible"
-        component={Bible}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="book" size={size} color={color} />
           ),
         }}
       />
