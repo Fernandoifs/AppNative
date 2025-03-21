@@ -8,6 +8,7 @@ import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList, DrawerParamList } from '../navigation/types';
 import { quickAccessItems } from '../constants/navigation';
 import { useEventsStore } from '../store/events';
+import { useMembersStore } from '../store/members';
 import { WelcomeBanner } from 'components/home/WelcomeBanner';
 
 type HomeScreenProps = CompositeScreenProps<
@@ -18,26 +19,36 @@ type HomeScreenProps = CompositeScreenProps<
 export default function Home() {
   const navigation = useNavigation<HomeScreenProps['navigation']>();
   const { events, getEvents } = useEventsStore();
+  const { members } = useMembersStore();
 
   // Carrega os eventos ao abrir a tela
-  useEffect(() => {
+  useEffect(() => { console.log('Executando useEffect da Home...');
     getEvents();
-  }, [getEvents]);
+    console.log('Eventos carregados:', events);
+  }, [getEvents, events]);
 
   // Mapeia os itens de acesso rápido com navegação
   const mappedQuickAccessItems = quickAccessItems.map((item) => ({
     ...item,
-    onPress: () => navigation.navigate('TabNavigator', { screen: item.screenName }),
+    onPress: () => navigation.navigate(item.screenName),
   }));
 
   // Filtra os eventos futuros
   const currentDate = new Date();
+  console.log('Data Atual:', currentDate);
   const upcomingEvents = events
     .filter((event) => {
       const eventDate = new Date(`${event.date}T${event.time}`);
       return eventDate >= currentDate;
     })
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  // Filtra os membros novos (últimos 30 dias)
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const newMembers = members
+    .filter((member) => new Date(member.createdAt) >= thirtyDaysAgo)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
     <ScrollView className="flex-1 bg-white">
@@ -71,7 +82,7 @@ export default function Home() {
                 <View className="self-start px-2 py-1 mb-2 bg-blue-100 rounded-full">
                   <Text className="text-xs font-medium text-blue-700">{event.category}</Text>
                 </View>
-                <Text className="text-xl font-semibold text-gray-800">{event.category}</Text>
+                <Text className="text-xl font-semibold text-gray-800">{event.status}</Text>
                 <Text className="text-gray-600">{event.date} • {event.time}</Text>
               </View>
             ))
@@ -89,7 +100,27 @@ export default function Home() {
         {/* 🆕 Novos Membros */}
         <View className="mt-8">
           <Text className="text-2xl font-semibold text-gray-800 mb-4">Novos Membros</Text>
-          <Text className="text-gray-600 text-center">Não há novos membros neste mês.</Text>
+          {newMembers.length > 0 ? (
+            newMembers.map((member) => (
+              <View key={member.id} className="mb-6 bg-blue-50 rounded-lg shadow-lg p-6">
+                <View className="flex-row items-center">
+                  <View className="w-12 h-12 bg-blue-200 rounded-full items-center justify-center">
+                    <Text className="text-blue-700 font-semibold text-lg">
+                      {member.name.charAt(0)}
+                    </Text>
+                  </View>
+                  <View className="ml-4">
+                    <Text className="text-gray-800 font-semibold">{member.name}</Text>
+                    <Text className="text-gray-600 text-sm">
+                      {new Date(member.createdAt).toLocaleDateString('pt-BR')}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            ))
+          ) : (
+            <Text className="text-gray-600 text-center">Não há novos membros neste mês.</Text>
+          )}
           <TouchableOpacity
             onPress={() => navigation.navigate('Members')}
             className="mt-4 bg-green-600 py-3 rounded-xl items-center self-center px-10 shadow-lg"
@@ -99,7 +130,7 @@ export default function Home() {
         </View>
 
         {/* 🎂 Aniversariantes do Mês */}
-        <View className="mt-8">
+        <View className="mt-8 mb-8">
           <Text className="text-2xl font-semibold text-gray-800 mb-4">Aniversariantes do Mês</Text>
           <View className="bg-blue-50 p-6 rounded-lg flex-row items-center mb-4 shadow-lg">
             <Image

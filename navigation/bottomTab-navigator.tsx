@@ -1,5 +1,5 @@
 import { Platform, useWindowDimensions } from 'react-native';
-import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StackScreenProps } from '@react-navigation/stack';
 
@@ -28,7 +28,7 @@ export default function BottomTabNavigator() {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#E5E7EB',
-          display: Platform.OS === 'web' && isLargeScreen ? 'none' : 'flex'
+          display: isLargeScreen ? 'none' : 'flex'
         }
       }}
     >

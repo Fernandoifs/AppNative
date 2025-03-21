@@ -3,23 +3,12 @@ import { FlatList, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '../components/Button';
 import type { Member } from '../types';
-
-const MOCK_MEMBERS: Member[] = [
-  {
-    id: '1',
-    name: 'João Silva',
-    email: 'joao@email.com',
-    phone: '(11) 99999-9999',
-    address: 'Rua A, 123',
-    birthDate: '1990-01-01',
-    status: 'active',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
+import { useMembersStore } from '../store/members';
+import { AddMemberModal } from './members/AddMemberModal';
 
 export default function Members() {
-  const [members] = useState<Member[]>(MOCK_MEMBERS);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const members = useMembersStore((state) => state.members);
 
   const renderMemberItem = ({ item }: { item: Member }) => (
     <View className="bg-white p-5 mb-4 rounded-xl shadow-md border border-gray-200">
@@ -44,7 +33,7 @@ export default function Members() {
       {/* Cabeçalho */}
       <View className="flex-row justify-between items-center mb-6">
         <Text className="text-3xl font-bold text-gray-900">Membros</Text>
-        <TouchableOpacity className="bg-indigo-600 p-4 rounded-full shadow-lg" onPress={() => {}}>
+        <TouchableOpacity className="bg-indigo-600 p-4 rounded-full shadow-lg" onPress={() => setIsAddModalVisible(true)}>
           <Ionicons name="add" size={24} color="white" />
         </TouchableOpacity>
       </View>
@@ -55,6 +44,11 @@ export default function Members() {
         renderItem={renderMemberItem}
         keyExtractor={(item) => item.id}
         className="flex-1"
+      />
+
+      <AddMemberModal
+        visible={isAddModalVisible}
+        onClose={() => setIsAddModalVisible(false)}
       />
     </View>
   );
