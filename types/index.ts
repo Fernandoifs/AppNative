@@ -18,6 +18,8 @@ export type Event = {
   date: string;
   time: string;
   status: string;
+  createdAt: string;
+  updatedAt: string;
   readings?: {
     book: string;
     chapter: number;
