@@ -10,7 +10,30 @@ interface MembersState {
 }
 
 export const useMembersStore = create<MembersState>((set, get) => ({
-  members: [],
+  members: [ 
+    {  
+      id: '1',
+      name: 'Alice Johnson',
+      email: 'alice@example.com',
+      phone: '(11) 77777-7777',
+      address: 'Rua Nova, 789',
+      birthDate: '1995-08-21',
+      status: 'active',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      id: '2',
+      name: 'Bob Smith',
+      email: '',
+      phone: '(11) 99999-9999',
+      address: 'Rua Antiga, 123',
+      birthDate: '1980-03-15',
+      status: 'active',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+  ],
   addMember: (memberData) => {
     const newMember: Member = {
       ...memberData,
